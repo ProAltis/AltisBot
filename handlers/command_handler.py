@@ -24,7 +24,7 @@ class CommandHandler():
     async def on_message(self, message):
         if message.author.bot:
             return False
-        if message.content.lower().startswith(config.command_prefix + 'status'):
+        if message.content.lower() == config.command_prefix + 'status'):
             await self.command_status(message)
             return True
         if message.content.lower().startswith(config.command_prefix + 'warn'):
@@ -33,12 +33,54 @@ class CommandHandler():
         if message.content.lower().startswith(config.command_prefix + 'user'):
             await self.command_user(message)
             return True
-        if message.content.lower().startswith(config.command_prefix + 'help'):
+        if message.content.lower() == config.command_prefix + 'help':
             await self.command_help(message)
             return True
-        if message.content.lower().startswith(config.command_prefix + 'ip'):
+        if message.content.lower() == config.command_prefix + 'ip':
             await self.command_ip(message)
             return True
+        if message.content.lower().startswith('!user'):
+            await self.command_incorrect_user(message)
+            return True
+        if message.content.lower().startswith('!warn'):
+            await self.command_incorrect_warn(message)
+            return True
+        if message.content.lower().startswith('!help'):
+            await self.command_incorrect_help(message)
+            return True
+
+    @rate_limited(1, 10)
+    async def command_incorrect_help(self, message):
+        cont = False
+        for role in message.author.roles:
+            if role.name.lower() in config.warn_command_allowed_roles:
+                cont = True
+        if not cont:
+            return
+        error_help = "Did you mean `-help` ?"
+        await self.client.send_message(message.channel, error_help)
+
+    @rate_limited(1, 10)
+    async def command_incorrect_warn(self, message):
+        cont = False
+        for role in message.author.roles:
+            if role.name.lower() in config.warn_command_allowed_roles:
+                cont = True
+        if not cont:
+            return
+        error_help = "Did you mean `-warn` ?"
+        await self.client.send_message(message.channel, error_warn)
+
+    @rate_limited(1, 10)
+    async def command_incorrect_user(self, message):
+        cont = False
+        for role in message.author.roles:
+            if role.name.lower() in config.warn_command_allowed_roles:
+                cont = True
+        if not cont:
+            return
+        error_help = "Did you mean `-user` ?"
+        await self.client.send_message(message.channel, error_user)
 
     @rate_limited(1, 15)
     async def command_ip(self, message):
